@@ -1,0 +1,91 @@
+
+.maincontainer{
+    display: flex;
+    justify-content:space-around;
+    background:white;
+    column-gap: 6px;
+}
+
+.container{
+    display: block;
+    border-radius: 20px;
+    background-color: white;
+    height: 50px;
+    width: 100px;
+    text-align:center;
+    visibility: hidden;
+    
+}
+
+.maindiv{
+   
+    background-image: url(../pages/uefa.png);
+    background-size: contain;
+    background-position: center;
+}
+
+.show{
+    visibility: visible !important;
+
+
+}
+
+#name{
+    color: chocolate;
+    text-align: center;
+    
+}
+
+/* 
+
+.animation{
+    
+        width: 100px;
+        height: 100px;
+        background-color: red;
+        animation-name: example;
+        animation-duration: 4s;
+      
+      
+} */
+/* 
+@keyframes example {
+    from {background-color: red;}
+    to {background-color: yellow;}
+  } */
+
+
+  @keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
+  }
+
+
+  .animation{
+    
+    width: 100px;
+    height: 100px;
+    
+    animation-name: rotation;
+    animation-duration: 4s;
+  
+  
+}
+
+
+.group{
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    column-gap: 1px;
+    
+    MARGIN-LEFT: 250PX;
+    margin-top: 50PX;
+}
+
+
+
