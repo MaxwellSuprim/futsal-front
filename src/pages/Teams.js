@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react'
 import { useEffect, useState } from 'react'
-import { getteam, postteam } from '../config/config'
+import { getteam, httpGet, httpPut, postteam } from '../config/config'
 import uefa from "../pages/uefa.png"
 import "../css/Teams.css"
 
@@ -13,7 +13,7 @@ const TeamList = () => {
   const [teamB, setTeamB] = useState([])
 
   useEffect(() => {
-    getteam("/api/team")
+    httpGet("/api/team")
       .then(success => {
         console.log(success)
         console.log("aakash")
@@ -23,52 +23,72 @@ const TeamList = () => {
       .catch(err => console.log(err))
 
   }, [])
+
+  const onGetGroup = () => {
+    httpGet('api/fixture/group/A')
+      .then(console.log)
+  }
   //const t1 =["barcelona","madrid","liverpool","bayern","chealsea","tottenham","arsenal","acmilan","intermilan","Lazio"]
   let count = 0
   let group = ''
   const change = (e) => {
 
     let elem = e.target;
-    let team = e.target.getAttribute('teamId')
-    let teamName = e.target.getAttribute('teamName')
+    //console.log(elem)
+    let team_id = e.target.getAttribute('teamId')
+    let teamname = e.target.getAttribute('teamname')
+   
     elem.classList.add('animation')
 
     let para = elem.children[0]
+    console.log(elem.children[0])
     // console.log(para.innerHTML)
     count++
     if (teamA.length > teamB.length) {
       group = "B"
       console.log(teamA.length, teamB.length)
-      setTeamB([...teamB, teamName])
+      setTeamB([...teamB, teamname])
     }
     else {
       group = 'A'
-      setTeamA([...teamA, teamName])
+      setTeamA([...teamA, teamname])
     }
 
 
 
-    postteam(`/api/team/${group}`, {
-      team
+    httpPut(`/api/team/${team_id}`, {
+      group: group
     })
       .then(success => {
         console.log(success)
         console.log("added to db")
-        setTeam(success)
+        // setTeam(success)
+        setTimeout(() => {
+          let ts = team.filter(t => t._id !== team_id);
+          // setTeam(ts)
+        }, 4000)
       }
       )
       .catch(err => console.log(err))
 
-    // para.classList.add('animation')
-    // setTimeout(() => {
+     para.classList.add('animation')
+     
+     setTimeout(() => {
+      elem.classList.remove('maindiv')
     para.classList.toggle('show')
-    elem.classList.remove('maindiv')
-    // }, 4000);//toggle to add or remove.add matra use garda hunxa hamlae aile
+    
+     }, 4000);//toggle to add or remove.add matra use garda hunxa hamlae aile
     // para.style.visibility ="visible"; 
+  setTimeout(()=>{
+    let eleme =document.getElementById(teamname)
+    eleme.remove()
+    
+    //alert(`group  allocated for ${teamname}`)
+  },5000)
+    
 
 
   }
-
 
   return (
     <div>
@@ -78,8 +98,9 @@ const TeamList = () => {
 
           return (
 
-            <div key={team1._id} teamName={team1.teamname} teamId={team1._id} className="maindiv" style={{ border: "1px solid black" }
+            <div key={team1._id} id={team1.teamname} teamname={team1.teamname} teamId={team1._id} className="maindiv" style={{ border: "1px solid black" }
             } onClick={change}>
+              
               <p className='container'>{team1.teamname}</p>
             </div>
 
@@ -92,7 +113,7 @@ const TeamList = () => {
       <div className='group'>
 
         <div className="A">GROUP A
-          <p id="A">
+          
             {
               teamB.map(t => {
                 return (
@@ -102,22 +123,22 @@ const TeamList = () => {
                 )
               })
             }
-          </p>
+          
         </div>
-        <div className='B'>GROUP B</div>
-        
-          {
-            teamA.map(t => {
-              return (
-                <div>
-                  {t}
-                </div>
-              )
-            })
-          }
-        
-      </div>
+        <div className='B'>GROUP B
 
+        {
+          teamA.map(t => {
+            return (
+              <div>
+                {t}
+              </div>
+            )
+          })
+        }
+      </div>
+      </div>
+      <button onClick={onGetGroup}>Get All</button>
     </div >
 
 

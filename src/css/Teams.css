@@ -15,6 +15,8 @@
     text-align:center;
     visibility: hidden;
     
+    
+    
 }
 
 .maindiv{
@@ -22,6 +24,7 @@
     background-image: url(../pages/uefa.png);
     background-size: contain;
     background-position: center;
+    overflow-y: clip;
 }
 
 .show{
@@ -68,23 +71,27 @@
   .animation{
     
     width: 100px;
-    height: 100px;
+    
     
     animation-name: rotation;
     animation-duration: 4s;
+    
   
   
 }
 
+.overflowhidden{
+  overflow: hidden;
+}
+
 
 .group{
-    display: flex;
-    justify-content: space-around;
-    background: white;
-    column-gap: 1px;
-    
-    MARGIN-LEFT: 250PX;
-    margin-top: 50PX;
+  display: flex;
+  justify-content: center;
+  background: white;
+  column-gap: 20em;
+  MARGIN-LEFT: 50px;
+  margin-top: 20PX;
 }
 
 

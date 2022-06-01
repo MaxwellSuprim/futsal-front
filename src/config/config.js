@@ -6,12 +6,12 @@ const http = axios.create({
     responseType: "json"
 })
 
-export const getteam= (url)=>{
+export const httpGet= (url)=>{
     return http.get(url)
     .then((data)=>data.data)
 }
 
-export const postteam=(url,data)=>{
+export const httpPut=(url,data)=>{
     return http.put(url,data)
     .then(console.log)
 }
