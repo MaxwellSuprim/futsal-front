@@ -6,6 +6,10 @@
     column-gap: 6px;
 }
 
+
+.flip{
+  opacity: 0;
+}
 .container{
     display: block;
     border-radius: 20px;

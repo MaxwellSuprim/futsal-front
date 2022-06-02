@@ -1,8 +1,8 @@
 
 import * as axios from "axios"
 const http = axios.create({
-    baseURL: "http://localhost:9000/",
-    timeout: 3000,
+    baseURL: "http://localhost:5000/",
+    timeout: 5000,
     responseType: "json"
 })
 

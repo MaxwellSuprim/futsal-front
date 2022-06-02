@@ -1,153 +1,110 @@
+import React, { useRef } from "react";
+import { useEffect, useState } from "react";
+import { getteam, httpGet, httpPut, postteam } from "../config/config";
+import uefa from "../pages/uefa.png";
+import "../css/Teams.css";
 
-import React, { useRef } from 'react'
-import { useEffect, useState } from 'react'
-import { getteam, httpGet, httpPut, postteam } from '../config/config'
-import uefa from "../pages/uefa.png"
-import "../css/Teams.css"
+const TeamList = ({ socket }) => {
+  const [teams, setTeams] = useState([]);
+  const [teamA, setTeamA] = useState([]);
+  const [teamB, setTeamB] = useState([]);
+  const [clickedItem, setclickedItem] = useState(null);
 
-const TeamList = () => {
-
-
-  const [team, setTeam] = useState([])
-  const [teamA, setTeamA] = useState([])
-  const [teamB, setTeamB] = useState([])
-
+  const socketListener = () => {
+    socket.on("clickedItem", ({ team, teams }) => {
+      addToGroup(team, teams);
+    });
+  };
   useEffect(() => {
-    httpGet("/api/team")
-      .then(success => {
-        console.log(success)
-        console.log("aakash")
-        setTeam(success)
-      }
-      )
-      .catch(err => console.log(err))
+    httpGet("/api/teams")
+      .then((success) => {
+        setTeams(success.teams);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  useEffect(() => {
+    socketListener();
+    return () => socket.off("clickedItem");
+  }, [teamA, teamB]);
 
-  }, [])
+  function addToGroup(team, teams) {
+    setclickedItem(team);
 
-  const onGetGroup = () => {
-    httpGet('api/fixture/group/A')
-      .then(console.log)
-  }
-  //const t1 =["barcelona","madrid","liverpool","bayern","chealsea","tottenham","arsenal","acmilan","intermilan","Lazio"]
-  let count = 0
-  let group = ''
-  const change = (e) => {
-
-    let elem = e.target;
-    //console.log(elem)
-    let team_id = e.target.getAttribute('teamId')
-    let teamname = e.target.getAttribute('teamname')
-   
-    elem.classList.add('animation')
-
-    let para = elem.children[0]
-    console.log(elem.children[0])
-    // console.log(para.innerHTML)
-    count++
     if (teamA.length > teamB.length) {
-      group = "B"
-      console.log(teamA.length, teamB.length)
-      setTeamB([...teamB, teamname])
+      setTeamB([...teamB, team.name]);
+    } else {
+      setTeamA([...teamA, team.name]);
     }
-    else {
-      group = 'A'
-      setTeamA([...teamA, teamname])
-    }
+    // if (teams.length && team) {
 
-
-
-    httpPut(`/api/team/${team_id}`, {
-      group: group
-    })
-      .then(success => {
-        console.log(success)
-        console.log("added to db")
-        // setTeam(success)
-        setTimeout(() => {
-          let ts = team.filter(t => t._id !== team_id);
-          // setTeam(ts)
-        }, 4000)
-      }
-      )
-      .catch(err => console.log(err))
-
-     para.classList.add('animation')
-     
-     setTimeout(() => {
-      elem.classList.remove('maindiv')
-    para.classList.toggle('show')
-    
-     }, 4000);//toggle to add or remove.add matra use garda hunxa hamlae aile
-    // para.style.visibility ="visible"; 
-  setTimeout(()=>{
-    let eleme =document.getElementById(teamname)
-    eleme.remove()
-    
-    //alert(`group  allocated for ${teamname}`)
-  },5000)
-    
-
-
+    setTeams(teams);
+    // }
   }
 
+  // const onGetGroup = () => {
+  //   httpGet("api/fixture/group/A").then(console.log);
+  // };
+  //const t1 =["barcelona","madrid","liverpool","bayern","chealsea","tottenham","arsenal","acmilan","intermilan","Lazio"]
+
+  const clickHander = async (e) => {
+    e.preventDefault();
+    const teamId = e.target.getAttribute("teamid");
+    const tm = teams.find((t) => t._id === teamId);
+    let tms = teams.filter((team) => team._id !== tm._id);
+    if (localStorage.getItem("isOrganizer")) {
+      addToGroup(tm, tms);
+      await httpPut(`/api/teams/assign/${teamId}`, {
+        group: teamA.length > teamB.length ? "B" : "A",
+      });
+      socket.emit("clickedItem", {
+        team: tm,
+        teams: tms,
+      });
+    }
+    return;
+  };
+
+  const onGetFixture = () => {
+    httpGet("/api/groups/fixture").then(console.log);
+  };
   return (
     <div>
       <p id="name">TEAMS FOR DRAW</p>
-      <div className='maincontainer' >
-        {team.map((team1, index) => {
-
+      <div className="maincontainer">
+        {teams.map((team1, index) => {
           return (
-
-            <div key={team1._id} id={team1.teamname} teamname={team1.teamname} teamId={team1._id} className="maindiv" style={{ border: "1px solid black" }
-            } onClick={change}>
-              
-              <p className='container'>{team1.teamname}</p>
+            <div
+              key={team1._id}
+              teamid={team1._id}
+              className={`maindiv ${
+                clickedItem?._id === team1._id ? " flip" : ""
+              }`}
+              style={{ border: " 1px solid black" }}
+              onClick={clickHander}
+            >
+              <p className="container">{team1.name}</p>
             </div>
-
-
-          )
+          );
         })}
-      </div >
+      </div>
 
-
-      <div className='group'>
-
-        <div className="A">GROUP A
-          
-            {
-              teamB.map(t => {
-                return (
-                  <div>
-                    {t}
-                  </div>
-                )
-              })
-            }
-          
+      <div className="group">
+        <div className="A">
+          GROUP A
+          {teamB.map((t, i) => {
+            return <div key={i}>{t}</div>;
+          })}
         </div>
-        <div className='B'>GROUP B
-
-        {
-          teamA.map(t => {
-            return (
-              <div>
-                {t}
-              </div>
-            )
-          })
-        }
+        <div className="B">
+          GROUP B
+          {teamA.map((t, i) => {
+            return <div key={i}>{t}</div>;
+          })}
+        </div>
       </div>
-      </div>
-      <button onClick={onGetGroup}>Get All</button>
-    </div >
+      <button onClick={onGetFixture}>Get All Fixture</button>
+    </div>
+  );
+};
 
-
-
-  )
-}
-
-export default TeamList
-
-
-
-
+export default TeamList;
